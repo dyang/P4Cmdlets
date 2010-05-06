@@ -41,13 +41,17 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Management.Automation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Program Files\Reference Assemblies\Microsoft\WindowsPowerShell\v1.0\System.Management.Automation.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cmdlets\ConnectRepository.cs" />
+    <Compile Include="Connection.cs" />
+    <Compile Include="P4.cs" />
     <Compile Include="P4CmdletsSnapIn.cs">
       <SubType>Component</SubType>
     </Compile>
