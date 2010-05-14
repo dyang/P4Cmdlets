@@ -7,18 +7,39 @@ namespace P4Cmdlets.Test
     [TestFixture]
     public class ConnectionTest
     {
+        private P4Fixture _fixture;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new P4Fixture();
+            _fixture.SetUpServer();
+            _fixture.SetUpClient();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _fixture.Dispose();
+        }
+
         [Test]
         public void ShouldConnectAndDisconnect()
         {
-            using (var p4Fixture = new P4Fixture())
+            using (P4 p4 = P4.Connect(P4Fixture.Host, P4Fixture.Port, P4Fixture.User, P4Fixture.Password, P4Fixture.Client))
             {
-                p4Fixture.SetUpServer();
-                p4Fixture.SetUpClient();
-                P4 p4 = new P4();
-                Connection conn = p4.Connect(P4Fixture.Host, P4Fixture.Port,  P4Fixture.User, P4Fixture.Password, P4Fixture.Client);
-                Assert.IsTrue(conn.IsValidConnection);
+                Assert.IsTrue(p4.IsValidConnection);
+            }
+        }
 
-                p4.Disconnect(conn);
+        [Test]
+        public void ShouldCreateChangelist()
+        {
+            using (P4 p4 = P4.Connect(P4Fixture.Host, P4Fixture.Port, P4Fixture.User, P4Fixture.Password, P4Fixture.Client))
+            {
+                Changelist pending = p4.CreateChangelist("Description");
+                Assert.AreEqual("Description", pending.Description);
+                Assert.IsTrue(pending.Id > 0);
             }
         }
     }

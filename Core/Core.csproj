@@ -49,8 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Changelist.cs" />
     <Compile Include="Cmdlets\ConnectRepository.cs" />
-    <Compile Include="Connection.cs" />
     <Compile Include="P4.cs" />
     <Compile Include="P4CmdletsSnapIn.cs">
       <SubType>Component</SubType>
