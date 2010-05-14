@@ -8,17 +8,17 @@ namespace P4Cmdlets.Test
     public class ConnectionTest
     {
         [Test]
-        public void ShouldLoginAndLogout()
+        public void ShouldConnectAndDisconnect()
         {
             using (var p4Fixture = new P4Fixture())
             {
                 p4Fixture.SetUpServer();
+                p4Fixture.SetUpClient();
                 P4 p4 = new P4();
-                Connection conn = p4.Login("username", "password", "client");
+                Connection conn = p4.Connect(P4Fixture.Host, P4Fixture.Port,  P4Fixture.User, P4Fixture.Password, P4Fixture.Client);
                 Assert.IsTrue(conn.IsValidConnection);
 
-                p4.Logout(conn);
-                Assert.IsFalse(conn.IsValidConnection);
+                p4.Disconnect(conn);
             }
         }
     }

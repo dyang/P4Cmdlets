@@ -19,7 +19,7 @@ namespace P4Cmdlets.Test.Util
             // Copy each file into it's new directory.
             foreach (FileInfo fi in source.GetFiles())
             {
-                fi.CopyTo(Path.Combine(target.ToString(), fi.Name), true);
+                fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
             }
 
             // Copy each subdirectory using recursion.
@@ -29,6 +29,15 @@ namespace P4Cmdlets.Test.Util
                     target.CreateSubdirectory(diSourceSubDir.Name);
                 CopyDirectory(diSourceSubDir, nextTargetSubDir);
             }
+        }
+
+        public static DirectoryInfo CreateTempDirectory()
+        {
+            string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            DirectoryInfo dir = Directory.CreateDirectory(path);
+            if (dir == null || !dir.Exists) 
+                throw new Exception("Unable to create directory at " + path);
+            return dir;
         }
     }
 }
