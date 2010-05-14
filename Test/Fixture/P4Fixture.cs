@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 using P4Cmdlets.Test.Util;
 
 namespace P4Cmdlets.Test.Fixture
@@ -20,21 +19,21 @@ namespace P4Cmdlets.Test.Fixture
                 throw new Exception("Unable to create directory at " + serverPath);
 
             // copy db to test repo folder
-            string dbPath = Path.Combine(System.Environment.CurrentDirectory, @"..\..\Data\P4");
+            string dbPath = Path.Combine(Environment.CurrentDirectory, @"..\..\Data\P4");
             FileUtil.CopyDirectory(new DirectoryInfo(dbPath), new DirectoryInfo(serverPath));
 
             // execute p4d -r -p cmd to start p4d
-            Command.Run("p4d", "-r", serverPath, "-p", PORT);
+            Command.Named("p4d").WithArguments("-r", serverPath, "-p", PORT).Run();
 
             // verify p4d is started
-            if (!Command.WaitForCommandToSucceed("p4", "-p", P4PORT, "info"))
+            if (!Command.Named("p4").WithArguments("-p", P4PORT, "info").WaitForCommandToSucceed())
                 throw new Exception("Unable to start p4 server in one minute.  Check your test data & environment manually please");
 
         }
 
         public void TearDownServer()
         {
-            Command.RunAndWaitForExit("p4", "-p",  P4PORT, "admin", "stop");
+            Command.Named("p4").WithArguments("-p",  P4PORT, "admin", "stop").RunAndWaitForExit();
 
             if (_serverPathDir != null && _serverPathDir.Exists)
                 Command.WaitForCommandToSucceed(new Func<bool>(DeleteServerPath));

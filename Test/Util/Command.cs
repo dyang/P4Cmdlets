@@ -6,41 +6,83 @@ namespace P4Cmdlets.Test.Util
 {
     public class Command
     {
+        private readonly string _command;
+        private string[] _args;
+        private string _input;
         private const int TWENTY_SECONDS = 20 * 1000;
         private const int SLEEP_INTERVAL = 400;
 
-        public static void Run(string command, params string[] args)
+        private Command(string command)
         {
-            Process.Start(CreateStartInfo(command, args));
+            _command = command;
         }
 
-        public static CommandResult RunAndWaitForExit(string command, params string[] args)
+        public static Command Named(string command)
         {
-            // DY - redirect error/warning?
-             CommandResult result = new CommandResult();
+            return new Command(command);
+        }
 
-            using (Process process = Process.Start(CreateStartInfo(command, args)))
+        public Command WithArguments(params string[] args)
+        {
+            _args = args;
+            return this;
+        }
+
+        public Command WithInput(string input)
+        {
+            _input = input;
+            return this;
+        }
+
+        public void Run()
+        {
+            using (Process process = Process.Start(CreateStartInfo(_command, _args)))
             {
+                if (!string.IsNullOrEmpty(_input))
+                {
+                    using (StreamWriter inputWriter = process.StandardInput)
+                    {
+                        inputWriter.Write(_input);
+                    }
+                }    
+            }
+        }
+
+        public CommandResult RunAndWaitForExit()
+        {
+            CommandResult result = new CommandResult();
+            using (Process process = Process.Start(CreateStartInfo(_command, _args)))
+            {
+                if (!string.IsNullOrEmpty(_input))
+                {
+                    using (StreamWriter inputWriter = process.StandardInput)
+                    {
+                        inputWriter.Write(_input);
+                    }
+                }
+
+                process.WaitForExit();
+                result.ExitCode = process.ExitCode;
                 using (StreamReader outputReader = process.StandardOutput)
                 {
-                    process.WaitForExit();
                     result.Output = outputReader.ReadToEnd();
-                    result.ExitCode = process.ExitCode;
-
-                    Debug.WriteLine(string.Format("Running command {0} with arguments: {1}", command, string.Join(" ", args)));
-                    Debug.WriteLine("Output: " + result.Output);
-                    Debug.WriteLine("ExitCode: " + result.ExitCode);
                 }
+                using (StreamReader errorReader = process.StandardError)
+                {
+                    result.Error = errorReader.ReadToEnd();
+                }
+                return result;
             }
-            return result;
         }
 
-        private static ProcessStartInfo CreateStartInfo(string command, string[] args)
+        private ProcessStartInfo CreateStartInfo(string command, string[] args)
         {
             var startInfo = new ProcessStartInfo();
             startInfo.FileName = command;
             startInfo.Arguments = string.Join(" ", args);
             startInfo.RedirectStandardOutput = true;
+            startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardInput = true;
             startInfo.CreateNoWindow = true;
             startInfo.UseShellExecute = false;
             return startInfo;
@@ -49,6 +91,7 @@ namespace P4Cmdlets.Test.Util
         public class CommandResult
         {
             public string Output { get; set; }
+            public string Error { get; set; }
             public int ExitCode { get; set; }
 
             public bool IsSuccessful
@@ -58,12 +101,12 @@ namespace P4Cmdlets.Test.Util
         }
 
         // DY - see if there is anyway to remove the dup below
-        public static bool WaitForCommandToSucceed(string command, params string[] args)
+        public bool WaitForCommandToSucceed()
         {
-            int baseline = System.Environment.TickCount;
-            while (System.Environment.TickCount - baseline <= TWENTY_SECONDS)
+            int baseline = Environment.TickCount;
+            while (Environment.TickCount - baseline <= TWENTY_SECONDS)
             {
-                if (Command.RunAndWaitForExit(command, args).IsSuccessful)
+                if (RunAndWaitForExit().IsSuccessful)
                     return true;
                 System.Threading.Thread.Sleep(SLEEP_INTERVAL);
             }
@@ -73,15 +116,14 @@ namespace P4Cmdlets.Test.Util
         // DY - see if there is anyway to remove the dup
         public static bool WaitForCommandToSucceed(Func<bool> command)
         {
-            int baseline = System.Environment.TickCount;
-            while (System.Environment.TickCount - baseline <= TWENTY_SECONDS)
+            int baseline = Environment.TickCount;
+            while (Environment.TickCount - baseline <= TWENTY_SECONDS)
             {
                 if (command()) return true;
                 System.Threading.Thread.Sleep(SLEEP_INTERVAL);
             }
             return false;
         }
-
 
     }
 }
