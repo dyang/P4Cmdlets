@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Changelist.cs" />
     <Compile Include="Cmdlets\ConnectRepository.cs" />
+    <Compile Include="Description.cs" />
     <Compile Include="P4.cs" />
     <Compile Include="P4CmdletsSnapIn.cs">
       <SubType>Component</SubType>

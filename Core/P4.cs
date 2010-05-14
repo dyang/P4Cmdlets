@@ -39,5 +39,10 @@ namespace P4Cmdlets.Core
         {
             _p4.Dispose();
         }
+
+        public void AddFile(Changelist pending, string file)
+        {
+            _p4.Run("add", "-c", pending.Id.ToString(), file);
+        }
     }
 }
