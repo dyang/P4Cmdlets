@@ -49,10 +49,10 @@ namespace P4Cmdlets.Test
             using (P4 p4 = P4.Connect(P4Fixture.Host, P4Fixture.Port, P4Fixture.User, P4Fixture.Password, P4Fixture.Client))
             {
                 Changelist pending = p4.CreateChangelist("Description");
-                Assert.AreEqual(0, _fixture.Describe(pending).NumberOfFiles);
+                Assert.AreEqual(0, p4.Describe(pending).NumberOfFiles);
 
                 p4.AddFile(pending, _fixture.Touch("file"));
-                 Assert.AreEqual(1, _fixture.Describe(pending).NumberOfFiles);
+                 Assert.AreEqual(1, p4.Describe(pending).NumberOfFiles);
             }
         }
     }

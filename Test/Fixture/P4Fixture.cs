@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using P4Cmdlets.Core;
 using P4Cmdlets.Test.Util;
 
 namespace P4Cmdlets.Test.Fixture
@@ -103,15 +102,6 @@ namespace P4Cmdlets.Test.Fixture
             {
                 return false;
             }
-        }
-
-        public Description Describe(Changelist changelist)
-        {
-            var result = Command.Named("p4").WithArguments("-p", P4Port, "describe", changelist.Id.ToString()).RunAndWaitForExit();
-            if (!result.IsSuccessful)
-                throw new Exception("Failed to describe changelist " + changelist.Id + ": " + changelist.Description + ".  Error: " + result.Error);
-
-            return new Description(result.Output);
         }
 
         public string Touch(string filename)

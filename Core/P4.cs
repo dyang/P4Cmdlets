@@ -44,5 +44,11 @@ namespace P4Cmdlets.Core
         {
             _p4.Run("add", "-c", pending.Id.ToString(), file);
         }
+
+        public Description Describe(Changelist changelist)
+        {
+            P4UnParsedRecordSet result = _p4.RunUnParsed("describe", changelist.Id.ToString());
+            return new Description(result.Messages);
+        }
     }
 }

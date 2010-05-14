@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DescriptionTest.cs" />
     <Compile Include="Fixture\P4Fixture.cs" />
     <Compile Include="P4Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
